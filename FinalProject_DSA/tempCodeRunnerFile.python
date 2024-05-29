@@ -1,0 +1,90 @@
+
+import csv
+
+class TreeNode:
+    def __init__(self, item_id, name, Category, Ingrediants, Price, rating):
+        self.item_id = item_id
+        self.name = name
+        self.Category = Category
+        self.Ingrediants = Ingrediants
+        self.Price = Price
+        self.rating = rating
+        self.left = None
+        self.right = None
+
+class BinarySearchTree:
+    def __init__(self):
+        self.root = None
+
+    def insert(self, item_id, name, Category, Ingrediants, Price, rating):
+        self.root = self._insert(self.root, item_id, name, Category, Ingrediants, Price, rating)
+
+    def _insert(self, root, item_id, name, Category, Ingrediants, Price, rating):
+        if not root:
+            return TreeNode(item_id, name, Category, Ingrediants, Price, rating)
+
+        if item_id < root.item_id:
+            root.left = self._insert(root.left, item_id, name, Category, Ingrediants, Price, rating)
+        elif item_id > root.item_id:
+            root.right = self._insert(root.right, item_id, name, Category, Ingrediants, Price, rating)
+
+        return root
+
+    def display_inorder(self):
+        self._display_inorder(self.root)
+
+    def _display_inorder(self, root):
+        if root:
+            self._display_inorder(root.left)
+            print(f"Food ID: {root.item_id}, Name: {root.name}, Category: {root.Category}, Ingrediants: {root.Ingrediants}, Price: {root.Price}, Rating: {root.rating}")
+            self._display_inorder(root.right)
+    def search(self, value):
+        return self._search(self.root, value)
+
+    def _search(self, root, value):
+        if not root or not value:
+            return None
+
+        # Check if the value is present in any column
+        if (
+            value == root.item_id
+            or value == root.name
+            or value == root.Category
+            or value == root.Ingrediants
+            or value == root.Price
+            or value == root.rating
+        ):
+            return root
+
+        # Recursively search in left and right subtrees
+        left_result = self._search(root.left, value)
+        right_result = self._search(root.right, value)
+
+        # Return the first non-None result
+        return left_result if left_result else right_result
+
+# Function to read data from CSV and store in BST
+def read_csv_and_store_bst(filename, bst):
+    with open(filename, 'r', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            bst.insert(
+                row['Item_ID'],
+                row['Name'],
+                row['Category'],
+                row['Ingredients'],
+                row['Price'],
+                row['Rating']
+            )
+
+# Example usage
+if __name__ == "__main__":
+    bst = BinarySearchTree()
+    read_csv_and_store_bst('resturant1.csv', bst)
+    # bst.display_inorder()
+    search_result = bst.search('153')
+    if search_result:
+        print(f"Found: Food ID: {search_result.item_id}, Name: {search_result.name}, Category: {search_result.Category}, "
+              f"Ingredients: {search_result.Ingrediants}, Price: {search_result.Price}, Rating: {search_result.rating}")
+    else:
+        print("Not found.")
